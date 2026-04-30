@@ -24,6 +24,7 @@ RUN composer dump-autoload --no-scripts
 RUN npm install && npm run build
 
 # Permissions
+RUN mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs bootstrap/cache
 RUN chown -R www-data:www-data storage bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
 
