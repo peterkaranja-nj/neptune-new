@@ -40,7 +40,7 @@ RUN echo '<VirtualHost *:80>\n\
 RUN a2enmod rewrite
 
 # Runtime start script - artisan runs HERE where env vars from Render are available
-RUN printf '#!/bin/bash\nset -e\nmkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs bootstrap/cache\nchown -R www-data:www-data storage bootstrap/cache\ntouch database/database.sqlite\nchown -R www-data:www-data database\nphp artisan package:discover --ansi || true\nphp artisan migrate --force\nphp artisan config:cache || true\nphp artisan route:cache || true\nphp artisan view:cache || true\napache2-foreground' > /start.sh && chmod +x /start.sh
+RUN printf '#!/bin/bash\nset -e\nmkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs bootstrap/cache\nchown -R www-data:www-data storage bootstrap/cache\nchmod -R 775 storage bootstrap/cache\ntouch database/database.sqlite\nchown -R www-data:www-data database\nchmod 775 database\nif [ -z "$APP_KEY" ]; then php artisan key:generate --force; fi\nphp artisan package:discover --ansi || true\nphp artisan migrate --force\nphp artisan config:cache || true\nphp artisan route:cache || true\nphp artisan view:cache || true\napache2-foreground' > /start.sh && chmod +x /start.sh
 
 EXPOSE 80
 
