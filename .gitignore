@@ -24,10 +24,6 @@ yarn-error.log
 /wordpress
 wordpress/
 
-# Config folder - 
-/config
-config/
-
 # Large files 
 *.zip
 *.tar
