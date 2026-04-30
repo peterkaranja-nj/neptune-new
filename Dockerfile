@@ -1,9 +1,9 @@
 FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y \
-    git curl libpng-dev libonig-dev libxml2-dev zip unzip nodejs npm
+    git curl libpng-dev libonig-dev libxml2-dev libsqlite3-dev zip unzip nodejs npm
 
-RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+RUN docker-php-ext-install pdo_mysql pdo_sqlite sqlite3 mbstring exif pcntl bcmath gd
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -40,7 +40,7 @@ RUN echo '<VirtualHost *:80>\n\
 RUN a2enmod rewrite
 
 # Runtime start script - artisan runs HERE where env vars from Render are available
-RUN printf '#!/bin/bash\nset -e\nmkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs bootstrap/cache\nchown -R www-data:www-data storage bootstrap/cache\ntouch database/database.sqlite\nchown www-data:www-data database/database.sqlite\nphp artisan package:discover --ansi\nphp artisan migrate --force\nphp artisan config:cache\nphp artisan route:cache\nphp artisan view:cache\napache2-foreground' > /start.sh && chmod +x /start.sh
+RUN printf '#!/bin/bash\nset -e\nmkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions storage/logs bootstrap/cache\nchown -R www-data:www-data storage bootstrap/cache\ntouch database/database.sqlite\nchown -R www-data:www-data database\nphp artisan package:discover --ansi || true\nphp artisan migrate --force\nphp artisan config:cache || true\nphp artisan route:cache || true\nphp artisan view:cache || true\napache2-foreground' > /start.sh && chmod +x /start.sh
 
 EXPOSE 80
 
